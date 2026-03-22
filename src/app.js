@@ -1,7 +1,10 @@
 const express = require("express");
 const app = express();
+const { adminauth } = require("./middlewares/auth");
 
-app.get("/user/:userid", (req, res) => {
+app.use("/admin", adminauth);
+
+app.get("/admin", (req, res) => {
   console.log(req.params);
   res.send({ firstName: "Aakash", LastName: "B" });
 });

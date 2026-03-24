@@ -1,20 +1,14 @@
 const express = require("express");
 const app = express();
-const { adminauth } = require("./middlewares/auth");
+const connectDB = require("./config/Database");
 
-app.use("/admin", adminauth);
-
-app.get("/admin", (req, res) => {
-  console.log(req.params);
-  res.send({ firstName: "Aakash", LastName: "B" });
-});
-app.post("/user", (req, res) => {
-  res.send("data successfully fetched ");
-});
-app.delete("/user", (req, res) => {
-  res.send("deleted Successfully");
-});
-
-app.listen(3000, () => {
-  console.log("server is succesfully runninng on the port 3000");
-});
+connectDB()
+  .then(() => {
+    console.log("Successfully");
+    app.listen(7777, () => {
+      console.log("server is succesfully runninng on the port 7777");
+    });
+  })
+  .catch((err) => {
+    console.error("Database cant be established", err.message);
+  });

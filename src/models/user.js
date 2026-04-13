@@ -1,20 +1,26 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      require: true,
-      minLength: 25,
+      required: true,
+      maxLength: 25,
     },
     lastName: {
       type: String,
     },
     emailId: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid Email Adress:" + value);
+        }
+      },
     },
     age: {
       type: Number,
@@ -22,11 +28,11 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     gender: {
       type: String,
-      require: true,
+      required: true,
       validate(value) {
         if (!["male", "female", "others"].includes(value)) {
           throw new Error("Gender is not valid ");

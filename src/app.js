@@ -2,16 +2,47 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/Database");
 const user = require("./models/user");
+const { validateSignupData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const User = new user(req.body);
+  const User = require("./models/user");
 
   try {
-    await User.save();
+    validateSignupData(req);
+    const { firstName, lastName, emailId, password } = req.body;
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
+    await user.save();
     res.send("User Added Successfully");
   } catch (err) {
     res.status(400).send("Error saving the user" + err.message);
+  }
+});
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Creditionals");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      res.send("login successfull");
+    } else {
+      throw new Error("Invalid Creditionals");
+    }
+  } catch (err) {
+    res.status(400).send("something went wrong");
   }
 });
 app.get("/user", async (req, res) => {
